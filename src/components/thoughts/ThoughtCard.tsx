@@ -41,7 +41,7 @@ export function ThoughtCard({ thought: t, index, onStateChange, onDelete }: Prop
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, delay: index * 0.04, ease: 'easeOut' }}
+      transition={{ duration: 0.25, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="relative rounded-2xl overflow-hidden"
       style={{ background: '#141417', border: '0.5px solid #2C2C32' }}
     >

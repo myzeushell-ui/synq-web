@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { BottomNav } from './BottomNav';
 import { DemoBanner } from '../demo/DemoBanner';
 import { HomeScreen } from '../demo/HomeScreen';
@@ -12,10 +12,10 @@ import { CaptureModal } from '../thoughts/CaptureModal';
 
 export type Tab = 'home' | 'thoughts' | 'emotions' | 'reminders';
 
-const PAGE_VARIANTS = {
+const PAGE_VARIANTS: Variants = {
   initial:  { opacity: 0, y: 10 },
-  animate:  { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } },
-  exit:     { opacity: 0, y: -6, transition: { duration: 0.15, ease: 'easeIn' } },
+  animate:  { opacity: 1, y: 0, transition: { duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] } },
+  exit:     { opacity: 0, y: -6, transition: { duration: 0.15, ease: [0.55, 0, 1, 0.45] } },
 };
 
 export function Shell() {
