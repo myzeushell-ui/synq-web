@@ -10,8 +10,8 @@ const d = (days: number, hour = 9) => {
 export const DEMO_REMINDERS: Reminder[] = [
   {
     id: 'rem-1',
-    title: 'Investor pitch deck review',
-    description: 'Final check before the 10 AM demo call',
+    title: 'Проверка презентации для инвесторов',
+    description: 'Финальная проверка перед звонком в 10:00',
     dueAt: d(1, 8),
     category: 'task',
     done: false,
@@ -19,8 +19,8 @@ export const DEMO_REMINDERS: Reminder[] = [
   },
   {
     id: 'rem-2',
-    title: 'Morning check-in',
-    description: 'Capture how you feel before the day starts',
+    title: 'Утренний чек-ин',
+    description: 'Запишите, как вы себя чувствуете до начала дня',
     dueAt: d(0, 8),
     category: 'emotion',
     done: false,
@@ -28,8 +28,8 @@ export const DEMO_REMINDERS: Reminder[] = [
   },
   {
     id: 'rem-3',
-    title: 'Team standup',
-    description: 'Share blockers and wins',
+    title: 'Стендап команды',
+    description: 'Поделиться блокерами и победами',
     dueAt: d(1, 10),
     category: 'task',
     done: false,
@@ -37,8 +37,8 @@ export const DEMO_REMINDERS: Reminder[] = [
   },
   {
     id: 'rem-4',
-    title: 'Submit reimbursement form',
-    description: 'Finance deadline — do not forget',
+    title: 'Подать заявление на возмещение',
+    description: 'Дедлайн финансового отдела — не забыть',
     dueAt: d(7, 17),
     category: 'task',
     done: false,
@@ -46,8 +46,8 @@ export const DEMO_REMINDERS: Reminder[] = [
   },
   {
     id: 'rem-5',
-    title: 'Weekly reflection',
-    description: 'What went well? What drained you?',
+    title: 'Еженедельная рефлексия',
+    description: 'Что прошло хорошо? Что забирало энергию?',
     dueAt: d(5, 19),
     category: 'emotion',
     done: false,
@@ -55,8 +55,8 @@ export const DEMO_REMINDERS: Reminder[] = [
   },
   {
     id: 'rem-6',
-    title: 'Book co-working space',
-    description: 'For next Tuesday\'s focus session',
+    title: 'Забронировать коворкинг',
+    description: 'На фокус-сессию в следующий вторник',
     dueAt: d(4, 9),
     category: 'task',
     done: true,

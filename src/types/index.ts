@@ -43,7 +43,7 @@ export interface Reminder {
   dueAt: string; // ISO string
   category: Category;
   done: boolean;
-  repeat?: 'none' | 'daily' | 'weekly';
+  repeat?: 'none' | 'daily' | 'weekly' | 'monthly';
 }
 
 export interface DemoUser {

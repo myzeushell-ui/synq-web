@@ -9,6 +9,7 @@ import { InsightCard } from '../emotional/InsightCard';
 
 interface Props {
   onCapture: () => void;
+  onChat: () => void;
 }
 
 const stagger: Variants = {
@@ -19,11 +20,11 @@ const item: Variants = {
   animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] } },
 };
 
-export function HomeScreen({ onCapture }: Props) {
+export function HomeScreen({ onCapture, onChat }: Props) {
   const active = DEMO_THOUGHTS.filter((t) => t.state === 'active');
-  const done   = DEMO_THOUGHTS.filter((t) => t.state === 'done').length;
-  const total  = DEMO_THOUGHTS.length;
-  const pct    = Math.round((done / total) * 100);
+  const done = DEMO_THOUGHTS.filter((t) => t.state === 'done').length;
+  const total = DEMO_THOUGHTS.length;
+  const pct = Math.round((done / total) * 100);
 
   return (
     <motion.div
@@ -34,12 +35,14 @@ export function HomeScreen({ onCapture }: Props) {
     >
       {/* Header */}
       <motion.div variants={item}>
-        <p className="text-xs font-medium" style={{ color: '#4A4850' }}>{greeting()}</p>
+        <p className="text-xs font-medium" style={{ color: '#4A4850' }}>
+          {greeting()}
+        </p>
         <h1 className="text-3xl font-bold tracking-tight mt-1" style={{ color: '#EEECEA' }}>
           Synq
         </h1>
         <p className="text-sm mt-1" style={{ color: '#888680' }}>
-          {DEMO_USER.avatar} &nbsp;{DEMO_USER.name} · {DEMO_USER.streak} day streak 🔥
+          {DEMO_USER.avatar} &nbsp;{DEMO_USER.name} · {DEMO_USER.streak} дней подряд 🔥
         </p>
       </motion.div>
 
@@ -50,8 +53,14 @@ export function HomeScreen({ onCapture }: Props) {
         style={{ background: '#141417', border: '0.5px solid #2C2C32' }}
       >
         <div className="flex justify-between items-center mb-2">
-          <span className="text-xs" style={{ color: '#888680' }}>{done} of {total} captured things done</span>
-          {pct === 100 && <span className="text-xs" style={{ color: '#4ECBA0' }}>🎉 All done!</span>}
+          <span className="text-xs" style={{ color: '#888680' }}>
+            {done} из {total} выполнено
+          </span>
+          {pct === 100 && (
+            <span className="text-xs" style={{ color: '#4ECBA0' }}>
+              🎉 Всё готово!
+            </span>
+          )}
         </div>
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#242428' }}>
           <motion.div
@@ -72,7 +81,7 @@ export function HomeScreen({ onCapture }: Props) {
           className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-white font-semibold text-sm"
           style={{ background: '#7B6EF6' }}
         >
-          <span className="text-base">⚡</span> Capture a thought
+          <span className="text-base">⚡</span> Записать мысль
         </motion.button>
       </motion.div>
 
@@ -87,14 +96,30 @@ export function HomeScreen({ onCapture }: Props) {
             color: '#E07B62',
           }}
         >
-          <span>🌊</span> I feel overwhelmed
+          <span>🌊</span> Мне слишком много
+        </motion.button>
+      </motion.div>
+
+      {/* Talk to Synq button */}
+      <motion.div variants={item}>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={onChat}
+          className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 font-semibold text-sm"
+          style={{
+            background: 'linear-gradient(135deg, #1A1730 0%, #1C1C28 100%)',
+            border: '1px solid #3A3560',
+            color: '#9B8EFF',
+          }}
+        >
+          <span>🧠</span> Поговорить с Synq
         </motion.button>
       </motion.div>
 
       {/* Insights */}
       <motion.div variants={item}>
         <p className="text-[10px] font-semibold tracking-widest mb-3" style={{ color: '#4A4850' }}>
-          INSIGHTS
+          АНАЛИТИКА
         </p>
         <div className="flex flex-col gap-3">
           {DEMO_INSIGHTS.map((ins) => (
@@ -107,9 +132,11 @@ export function HomeScreen({ onCapture }: Props) {
       <motion.div variants={item}>
         <div className="flex items-center justify-between mb-3">
           <p className="text-[10px] font-semibold tracking-widest" style={{ color: '#4A4850' }}>
-            FOCUS
+            ФОКУС
           </p>
-          <span className="text-[10px]" style={{ color: '#4A4850' }}>{active.length} active</span>
+          <span className="text-[10px]" style={{ color: '#4A4850' }}>
+            {active.length} активных
+          </span>
         </div>
         <div className="flex flex-col gap-2.5">
           {active.slice(0, 4).map((t, i) => (

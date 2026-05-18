@@ -10,26 +10,27 @@ interface NavItem {
 }
 
 const ITEMS: NavItem[] = [
-  { id: 'home',      label: 'Home',      icon: '⌂' },
-  { id: 'thoughts',  label: 'Thoughts',  icon: '✦' },
-  { id: 'capture',   label: 'Capture',   icon: '+' },
-  { id: 'emotions',  label: 'Emotions',  icon: '♡' },
-  { id: 'reminders', label: 'Reminders', icon: '◷' },
+  { id: 'home', label: 'Главная', icon: '⌂' },
+  { id: 'thoughts', label: 'Мысли', icon: '✦' },
+  { id: 'capture', label: 'Запись', icon: '+' },
+  { id: 'emotions', label: 'Эмоции', icon: '♡' },
+  { id: 'reminders', label: 'Напомни', icon: '◷' },
 ];
 
 interface Props {
   current: Tab;
   onTab: (t: Tab) => void;
   onCapture: () => void;
+  darkMode?: boolean;
 }
 
-export function BottomNav({ current, onTab, onCapture }: Props) {
+export function BottomNav({ current, onTab, onCapture, darkMode = true }: Props) {
   return (
     <nav
       className="flex items-center justify-around py-2 px-4 shrink-0"
       style={{
-        background: '#141417',
-        borderTop: '0.5px solid #2C2C32',
+        background: darkMode ? '#141417' : '#FFFFFF',
+        borderTop: `0.5px solid ${darkMode ? '#2C2C32' : '#D8D6DC'}`,
         paddingBottom: 'max(env(safe-area-inset-bottom), 8px)',
       }}
     >
@@ -57,7 +58,7 @@ export function BottomNav({ current, onTab, onCapture }: Props) {
           <button
             key={item.id}
             onClick={() => onTab(item.id as Tab)}
-            className="flex flex-col items-center gap-1 min-w-[44px] py-1"
+            className="flex flex-col items-center gap-1 min-w-[44px] py-1 tap-scale"
           >
             <span
               className="text-lg leading-none transition-colors duration-150"

@@ -24,48 +24,48 @@ Priority: 🔴 High · 🟡 Medium · 🟢 Low
 
 ## UI Polish
 
-- [ ] 🟡 Add swipe-to-delete on ThoughtCard (touch devices)
-- [ ] 🟡 Add undo-delete snackbar
-- [ ] 🟡 Add pull-to-refresh animation
-- [ ] 🟡 Skeleton loading states
-- [ ] 🟡 Empty state illustrations (SVG/emoji based)
-- [ ] 🟡 Responsive: full desktop layout side-by-side (phone mockup)
-- [ ] 🟡 Dark/light mode toggle (persist in localStorage)
-- [ ] 🟢 Add micro-haptic CSS animation on button tap
+- [x] 🟡 Add swipe-to-delete on ThoughtCard (touch devices)
+- [x] 🟡 Add undo-delete snackbar
+- [x] 🟡 Add pull-to-refresh animation
+- [x] 🟡 Skeleton loading states
+- [x] 🟡 Empty state illustrations (SVG/emoji based)
+- [x] 🟡 Responsive: full desktop layout side-by-side (phone mockup)
+- [x] 🟡 Dark/light mode toggle (persist in localStorage)
+- [x] 🟢 Add micro-haptic CSS animation on button tap
 
 ---
 
 ## Capture Flow
 
-- [ ] 🟡 Multi-thought split preview (bullet → separate cards)
-- [ ] 🟡 Deadline chips in capture modal (Today / Tonight / Tomorrow / Custom)
-- [ ] 🟡 Reminder time picker
-- [ ] 🟢 Tag input (free-form tags on thoughts)
+- [x] 🟡 Multi-thought split preview (bullet → separate cards)
+- [x] 🟡 Deadline chips in capture modal (Today / Tonight / Tomorrow / Custom)
+- [x] 🟡 Reminder time picker
+- [x] 🟢 Tag input (free-form tags on thoughts)
 
 ---
 
 ## Emotions
 
-- [ ] 🟡 Mood trend chart (7-day sparkline)
-- [ ] 🟢 Export mood data as CSV
-- [ ] 🟢 Breathing exercise modal (box breathing)
+- [x] 🟡 Mood trend chart (7-day sparkline)
+- [x] 🟢 Export mood data as CSV
+- [x] 🟢 Breathing exercise modal (box breathing)
 
 ---
 
 ## Reminders
 
-- [ ] 🟡 Add reminder form (title, date, repeat)
-- [ ] 🟡 Connect reminders to thoughts (link a reminder to a thought)
-- [ ] 🟢 Calendar view (monthly grid)
+- [x] 🟡 Add reminder form (title, date, repeat)
+- [x] 🟡 Connect reminders to thoughts (link a reminder to a thought)
+- [x] 🟢 Calendar view (monthly grid)
 
 ---
 
 ## Developer Experience
 
-- [ ] 🟡 Add Prettier config
-- [ ] 🟡 Add Husky pre-commit hook (lint + typecheck)
+- [x] 🟡 Add Prettier config
+- [x] 🟡 Add Husky pre-commit hook (lint + typecheck)
 - [ ] 🟢 Add Storybook for UI components
-- [ ] 🟢 Add Jest unit tests for data helpers
+- [x] 🟢 Add Jest unit tests for data helpers
 
 ---
 
@@ -74,6 +74,6 @@ Priority: 🔴 High · 🟡 Medium · 🟢 Low
 - [ ] 🔴 Connect to real backend (Supabase)
 - [ ] 🔴 User authentication
 - [ ] 🔴 Data persistence across sessions
-- [ ] 🟡 SEO meta tags + OG image
-- [ ] 🟡 Error boundary + 404 page
+- [x] 🟡 SEO meta tags + OG image
+- [x] 🟡 Error boundary + 404 page
 - [ ] 🟢 Analytics (Plausible / Posthog)

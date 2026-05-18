@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -50,35 +50,35 @@
 
 /* Synq dark-first palette — always dark */
 :root {
-  --background: #0A0A0D;
-  --foreground: #EEECEA;
+  --background: #0a0a0d;
+  --foreground: #eeecea;
   --card: #141417;
-  --card-foreground: #EEECEA;
-  --popover: #1C1C21;
-  --popover-foreground: #EEECEA;
-  --primary: #7B6EF6;
-  --primary-foreground: #FFFFFF;
+  --card-foreground: #eeecea;
+  --popover: #1c1c21;
+  --popover-foreground: #eeecea;
+  --primary: #7b6ef6;
+  --primary-foreground: #ffffff;
   --secondary: #242428;
   --secondary-foreground: #888680;
-  --muted: #1C1C21;
+  --muted: #1c1c21;
   --muted-foreground: #888680;
-  --accent: #1E1A3A;
-  --accent-foreground: #7B6EF6;
-  --destructive: #E07B62;
-  --border: #2C2C32;
-  --input: #1C1C21;
-  --ring: #7B6EF6;
+  --accent: #1e1a3a;
+  --accent-foreground: #7b6ef6;
+  --destructive: #e07b62;
+  --border: #2c2c32;
+  --input: #1c1c21;
+  --ring: #7b6ef6;
   --radius: 1rem;
   /* Synq named tokens */
-  --synq-purple:  #7B6EF6;
-  --synq-coral:   #E07B62;
-  --synq-green:   #4ECBA0;
-  --synq-amber:   #E8B84B;
-  --synq-blue:    #5BA4F5;
-  --synq-text2:   #888680;
-  --synq-text3:   #4A4850;
-  --synq-surf2:   #1C1C21;
-  --synq-surf3:   #242428;
+  --synq-purple: #7b6ef6;
+  --synq-coral: #e07b62;
+  --synq-green: #4ecba0;
+  --synq-amber: #e8b84b;
+  --synq-blue: #5ba4f5;
+  --synq-text2: #888680;
+  --synq-text3: #4a4850;
+  --synq-surf2: #1c1c21;
+  --synq-surf3: #242428;
 }
 
 @layer base {
@@ -91,4 +91,37 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ── Micro-haptic tap animation ─────────────────────────────────────────── */
+@layer utilities {
+  .tap-scale {
+    transition: transform 80ms ease-out;
+  }
+  .tap-scale:active {
+    transform: scale(0.95);
+  }
+
+  /* Scrollbar hidden utility */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Pulse shimmer for skeleton states */
+@keyframes synq-shimmer {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+.synq-shimmer {
+  animation: synq-shimmer 1.4s ease-in-out infinite;
 }

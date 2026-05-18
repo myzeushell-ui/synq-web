@@ -1,49 +1,92 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DEMO_THOUGHTS } from '@/data/demoThoughts';
 import { getCategoryMeta } from '@/data/categories';
 import { ThoughtCard } from './ThoughtCard';
+import { ThoughtCardSkeleton } from './ThoughtCardSkeleton';
+import { EmptyState } from '../ui/EmptyState';
 import type { Category, TaskState, Thought } from '@/types';
 
 interface Props {
   onCapture: () => void;
+  extraThoughts?: import('@/types').Thought[];
 }
 
 const STATES: { id: TaskState | 'all'; label: string; color: string }[] = [
-  { id: 'all',        label: 'All',         color: '#7B6EF6' },
-  { id: 'active',     label: 'Active',      color: '#7B6EF6' },
-  { id: 'paused',     label: 'Paused',      color: '#E8B84B' },
-  { id: 'overwhelmed',label: 'Overwhelmed', color: '#E07B62' },
-  { id: 'done',       label: 'Done',        color: '#4ECBA0' },
+  { id: 'all', label: 'Все', color: '#7B6EF6' },
+  { id: 'active', label: 'Активные', color: '#7B6EF6' },
+  { id: 'paused', label: 'Пауза', color: '#E8B84B' },
+  { id: 'overwhelmed', label: 'Много', color: '#E07B62' },
+  { id: 'done', label: 'Готово', color: '#4ECBA0' },
 ];
 
-export function ThoughtsScreen({ onCapture }: Props) {
+export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
   const [stateFilter, setStateFilter] = useState<TaskState | 'all'>('all');
-  const [catFilter, setCatFilter]     = useState<Category | 'all'>('all');
-  const [query, setQuery]             = useState('');
-  const [thoughts, setThoughts]       = useState<Thought[]>(DEMO_THOUGHTS);
+  const [catFilter, setCatFilter] = useState<Category | 'all'>('all');
+  const [query, setQuery] = useState('');
+  const [thoughts, setThoughts] = useState<Thought[]>(DEMO_THOUGHTS);
+  const [loading, setLoading] = useState(true);
+  const [undoItem, setUndoItem] = useState<{ thought: Thought; idx: number } | null>(null);
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Merge voice-captured thoughts (prepend new ones, skip duplicates by id)
+  useEffect(() => {
+    if (!extraThoughts || extraThoughts.length === 0) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setThoughts((prev) => {
+      const existingIds = new Set(prev.map((t) => t.id));
+      const fresh = extraThoughts.filter((t) => !existingIds.has(t.id));
+      return fresh.length ? [...fresh, ...prev] : prev;
+    });
+  }, [extraThoughts]);
 
   const filtered = thoughts.filter((t) => {
     if (stateFilter !== 'all' && t.state !== stateFilter) return false;
-    if (catFilter   !== 'all' && t.category !== catFilter) return false;
+    if (catFilter !== 'all' && t.category !== catFilter) return false;
     if (query && !t.text.toLowerCase().includes(query.toLowerCase())) return false;
     return true;
   });
 
   const handleStateChange = (id: string, state: TaskState) => {
-    setThoughts((prev) => prev.map((t) => t.id === id ? { ...t, state } : t));
+    setThoughts((prev) => prev.map((t) => (t.id === id ? { ...t, state } : t)));
   };
+
   const handleDelete = (id: string) => {
+    const idx = thoughts.findIndex((t) => t.id === id);
+    if (idx < 0) return;
+    const removed = thoughts[idx];
     setThoughts((prev) => prev.filter((t) => t.id !== id));
+
+    // Clear previous undo timer
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    setUndoItem({ thought: removed, idx });
+
+    undoTimer.current = setTimeout(() => setUndoItem(null), 4000);
+  };
+
+  const handleUndo = () => {
+    if (!undoItem) return;
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    setThoughts((prev) => {
+      const next = [...prev];
+      next.splice(undoItem.idx, 0, undoItem.thought);
+      return next;
+    });
+    setUndoItem(null);
   };
 
   const sections: { state: TaskState; label: string; color: string }[] = [
-    { state: 'active',      label: 'ACTIVE',      color: '#7B6EF6' },
-    { state: 'paused',      label: 'PAUSED',      color: '#E8B84B' },
-    { state: 'overwhelmed', label: 'OVERWHELMED', color: '#E07B62' },
-    { state: 'done',        label: 'DONE',         color: '#4ECBA0' },
+    { state: 'active', label: 'АКТИВНЫЕ', color: '#7B6EF6' },
+    { state: 'paused', label: 'ПАУЗА', color: '#E8B84B' },
+    { state: 'overwhelmed', label: 'МНОГО', color: '#E07B62' },
+    { state: 'done', label: 'ГОТОВО', color: '#4ECBA0' },
   ];
 
   return (
@@ -51,14 +94,14 @@ export function ThoughtsScreen({ onCapture }: Props) {
       {/* Header */}
       <div className="px-5 pt-6 pb-3 flex items-center gap-3">
         <h2 className="text-2xl font-bold tracking-tight flex-1" style={{ color: '#EEECEA' }}>
-          Thoughts
+          Мысли
         </h2>
         <button
           onClick={onCapture}
           className="text-xs font-semibold px-3 py-1.5 rounded-full"
           style={{ background: '#1E1A3A', color: '#7B6EF6', border: '1px solid #2E2B4A' }}
         >
-          + Capture
+          + Записать
         </button>
       </div>
 
@@ -67,13 +110,9 @@ export function ThoughtsScreen({ onCapture }: Props) {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search thoughts…"
+          placeholder="Поиск мыслей…"
           className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{
-            background: '#141417',
-            border: '0.5px solid #2C2C32',
-            color: '#EEECEA',
-          }}
+          style={{ background: '#141417', border: '0.5px solid #2C2C32', color: '#EEECEA' }}
         />
       </div>
 
@@ -106,7 +145,7 @@ export function ThoughtsScreen({ onCapture }: Props) {
             color: catFilter === 'all' ? '#7B6EF6' : '#4A4850',
           }}
         >
-          All
+          Все
         </button>
         {(['task', 'idea', 'emotion', 'note'] as Category[]).map((c) => {
           const meta = getCategoryMeta(c);
@@ -127,17 +166,35 @@ export function ThoughtsScreen({ onCapture }: Props) {
         })}
       </div>
 
-      {/* Results */}
-      {filtered.length === 0 ? (
-        <div className="px-5 py-10 text-center">
-          <p className="text-2xl mb-2">✨</p>
-          <p className="text-sm" style={{ color: '#4A4850' }}>No thoughts match your filter.</p>
+      {/* Skeleton loading */}
+      {loading ? (
+        <div className="px-5 flex flex-col gap-2.5">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <ThoughtCardSkeleton key={i} />
+          ))}
         </div>
+      ) : filtered.length === 0 ? (
+        thoughts.length === 0 ? (
+          <EmptyState
+            emoji="✦"
+            title="Пока нет мыслей"
+            subtitle="Запишите, что у вас на уме — задачи, идеи, чувства. Без осуждения."
+            action={{ label: '+ Записать мысль', onClick: onCapture }}
+          />
+        ) : (
+          <EmptyState
+            emoji="🔍"
+            title="Ничего не найдено"
+            subtitle="Попробуйте изменить фильтры или поисковый запрос."
+          />
+        )
       ) : stateFilter !== 'all' ? (
         <div className="px-5 flex flex-col gap-2.5">
           {filtered.map((t, i) => (
             <ThoughtCard
-              key={t.id} thought={t} index={i}
+              key={t.id}
+              thought={t}
+              index={i}
               onStateChange={handleStateChange}
               onDelete={handleDelete}
             />
@@ -155,12 +212,16 @@ export function ThoughtsScreen({ onCapture }: Props) {
                   <span className="text-[10px] font-semibold tracking-widest" style={{ color }}>
                     {label}
                   </span>
-                  <span className="text-[10px]" style={{ color: `${color}88` }}>{items.length}</span>
+                  <span className="text-[10px]" style={{ color: `${color}88` }}>
+                    {items.length}
+                  </span>
                 </div>
                 <div className="flex flex-col gap-2.5">
                   {items.map((t, i) => (
                     <ThoughtCard
-                      key={t.id} thought={t} index={i}
+                      key={t.id}
+                      thought={t}
+                      index={i}
                       onStateChange={handleStateChange}
                       onDelete={handleDelete}
                     />
@@ -171,6 +232,37 @@ export function ThoughtsScreen({ onCapture }: Props) {
           })}
         </div>
       )}
+
+      {/* Undo snackbar */}
+      <AnimatePresence>
+        {undoItem && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-24 left-1/2 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl"
+            style={{
+              transform: 'translateX(-50%)',
+              background: '#1C1C21',
+              border: '0.5px solid #2C2C32',
+              maxWidth: 320,
+              width: 'calc(100% - 40px)',
+            }}
+          >
+            <span className="text-xs flex-1" style={{ color: '#888680' }}>
+              Мысль удалена
+            </span>
+            <button
+              onClick={handleUndo}
+              className="text-xs font-semibold"
+              style={{ color: '#7B6EF6' }}
+            >
+              Отменить
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

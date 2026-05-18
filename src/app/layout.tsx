@@ -9,6 +9,20 @@ export const metadata: Metadata = {
   description:
     'Synq helps you capture thoughts, emotions, tasks and reminders — safely and without judgment. Investor demo.',
   keywords: ['productivity', 'mental health', 'thought capture', 'emotions', 'tasks'],
+  openGraph: {
+    title: 'Synq — Emotional-safe thought capture',
+    description:
+      'Capture thoughts, log emotions, set reminders — in one calm, judgment-free space.',
+    type: 'website',
+    siteName: 'Synq',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Synq — Emotional-safe thought capture',
+    description:
+      'Capture thoughts, log emotions, set reminders — in one calm, judgment-free space.',
+  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
@@ -21,10 +35,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} dark h-full`}>
-      <body
-        className="min-h-full antialiased"
-        style={{ background: '#0A0A0D', color: '#EEECEA' }}
-      >
+      <body className="min-h-full antialiased" style={{ background: '#0A0A0D', color: '#EEECEA' }}>
         {children}
       </body>
     </html>
