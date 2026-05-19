@@ -189,7 +189,7 @@ export function EmotionsScreen({ extraEmotions, initialEmotions, onLogEmotion }:
               {avgIntensity}
             </p>
             <p className="text-xs mt-1" style={{ color: '#888680' }}>
-              Ср. интенсивность
+              Avg. intensity
             </p>
           </div>
         </div>
@@ -201,7 +201,7 @@ export function EmotionsScreen({ extraEmotions, initialEmotions, onLogEmotion }:
           className="w-full py-2.5 rounded-2xl text-xs font-semibold flex items-center justify-center gap-2"
           style={{ background: '#141417', border: '0.5px solid #2C2C32', color: '#888680' }}
         >
-          <span>↓</span> Экспорт настроений в CSV
+          <span>↓</span> Export emotions to CSV
         </motion.button>
 
         {/* Recent log */}
@@ -210,7 +210,7 @@ export function EmotionsScreen({ extraEmotions, initialEmotions, onLogEmotion }:
             className="text-[10px] font-semibold tracking-widest mb-3"
             style={{ color: '#4A4850' }}
           >
-            ПОСЛЕДНИЕ
+            RECENT
           </p>
           <div className="flex flex-col gap-2.5">
             {emotions.map((e, i) => {
