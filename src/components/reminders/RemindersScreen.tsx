@@ -18,7 +18,7 @@ import {
 const REPEAT_OPTS = ['none', 'daily', 'weekly', 'monthly'] as const;
 const CAT_OPTS: Category[] = ['task', 'idea', 'emotion', 'note'];
 
-const DOW = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+const DOW = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 function CalendarView({ reminders }: { reminders: Reminder[] }) {
   const [viewDate, setViewDate] = useState(() => {
@@ -130,10 +130,20 @@ function CalendarView({ reminders }: { reminders: Reminder[] }) {
 
 interface RemindersProps {
   extraReminders?: Reminder[];
+  initialReminders?: Reminder[];
+  onToggleReminder?: (id: string, done: boolean) => void;
+  onDeleteReminder?: (id: string) => void;
+  onAddReminder?: (r: Omit<Reminder, 'id' | 'done'>) => void;
 }
 
-export function RemindersScreen({ extraReminders }: RemindersProps) {
-  const [reminders, setReminders] = useState<Reminder[]>(DEMO_REMINDERS);
+export function RemindersScreen({ extraReminders, initialReminders, onToggleReminder, onDeleteReminder, onAddReminder }: RemindersProps) {
+  const [reminders, setReminders] = useState<Reminder[]>(initialReminders ?? DEMO_REMINDERS);
+
+  // Sync when initialReminders change
+  useEffect(() => {
+    if (initialReminders) setReminders(initialReminders);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialReminders]);
 
   // Merge voice-captured reminders (prepend new ones)
   useEffect(() => {
@@ -162,25 +172,31 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
     return d.toISOString().slice(0, 16);
   })();
 
-  const toggle = (id: string) =>
+  const toggle = (id: string) => {
+    const r = reminders.find((r) => r.id === id);
+    if (!r) return;
     setReminders((prev) => prev.map((r) => (r.id === id ? { ...r, done: !r.done } : r)));
+    onToggleReminder?.(id, !r.done);
+  };
 
   const handleAdd = () => {
     if (!formTitle.trim()) return;
+    const dueAt = formDueAt
+      ? new Date(formDueAt).toISOString()
+      : new Date(Date.now() + 86400000).toISOString();
     const newReminder: Reminder = {
       id: `rem-${Date.now()}`,
       title: formTitle.trim(),
       description: linkedThought
         ? `Linked: ${DEMO_THOUGHTS.find((t) => t.id === linkedThought)?.text.slice(0, 60) ?? ''}`
         : undefined,
-      dueAt: formDueAt
-        ? new Date(formDueAt).toISOString()
-        : new Date(Date.now() + 86400000).toISOString(),
+      dueAt,
       category: formCat,
       done: false,
       repeat: formRepeat,
     };
     setReminders((prev) => [newReminder, ...prev]);
+    onAddReminder?.({ title: newReminder.title, description: newReminder.description, dueAt, category: formCat, repeat: formRepeat });
     // Schedule browser notification
     if (new Date(newReminder.dueAt).getTime() > Date.now()) {
       requestPermission().then(() => {
@@ -207,10 +223,10 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight" style={{ color: '#EEECEA' }}>
-            Напоминания
+            Reminders
           </h2>
           <p className="text-sm mt-1" style={{ color: '#888680' }}>
-            {upcoming.length} предстоит · {done.length} готово
+            {upcoming.length} upcoming · {done.length} done
           </p>
           <button
             onClick={() => requestPermission()}
@@ -274,7 +290,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
                 className="text-[10px] font-semibold tracking-widest mb-3"
                 style={{ color: '#7B6EF6' }}
               >
-                НОВОЕ НАПОМИНАНИЕ
+                NEW REMINDER
               </p>
 
               {saved ? (
@@ -285,7 +301,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
                 >
                   <span className="text-xl">✓</span>
                   <span className="text-sm font-semibold" style={{ color: '#4ECBA0' }}>
-                    Напоминание добавлено!
+                    Reminder added!
                   </span>
                 </motion.div>
               ) : (
@@ -293,7 +309,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
                   <input
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
-                    placeholder="Что нужно не забыть?"
+                    placeholder="What do you need to remember?"
                     className="w-full rounded-xl px-3 py-2.5 text-sm outline-none mb-3"
                     style={{
                       background: '#0A0A0D',
@@ -327,7 +343,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
                   {/* Date & time picker */}
                   <div className="mb-3">
                     <p className="text-[10px] font-medium mb-1.5" style={{ color: '#4A4850' }}>
-                      ДАТА И ВРЕМЯ
+                      DATE & TIME
                     </p>
                     <input
                       type="datetime-local"
@@ -356,12 +372,12 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
                         }}
                       >
                         {r === 'none'
-                          ? 'Один раз'
+                          ? 'Once'
                           : r === 'daily'
-                            ? 'Ежедневно'
+                            ? 'Daily'
                             : r === 'weekly'
-                              ? 'Еженедельно'
-                              : 'Ежемесячно'}
+                              ? 'Weekly'
+                              : 'Monthly'}
                       </button>
                     ))}
                   </div>
@@ -369,7 +385,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
                   {/* Link to thought */}
                   <div className="mb-4">
                     <p className="text-[10px] font-medium mb-1.5" style={{ color: '#4A4850' }}>
-                      СВЯЗАТЬ С МЫСЛЬЮ (необязательно)
+                      LINK TO THOUGHT (optional)
                     </p>
                     <select
                       value={linkedThought}
@@ -382,7 +398,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
                         colorScheme: 'dark',
                       }}
                     >
-                      <option value="">— Нет —</option>
+                      <option value="">— None —</option>
                       {DEMO_THOUGHTS.filter((t) => t.state !== 'done').map((t) => (
                         <option key={t.id} value={t.id}>
                           {t.text.slice(0, 55)}
@@ -398,7 +414,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
                     className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all"
                     style={{ background: formTitle.trim() ? '#7B6EF6' : '#242428' }}
                   >
-                    Добавить напоминание
+                    Add reminder
                   </button>
                 </>
               )}
@@ -417,7 +433,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
             className="text-[10px] font-semibold tracking-widest mb-3"
             style={{ color: '#4A4850' }}
           >
-            ПРЕДСТОЯЩИЕ
+            UPCOMING
           </p>
           <div className="flex flex-col gap-2.5">
             {upcoming.map((r, i) => (
@@ -428,9 +444,9 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
       ) : viewMode === 'list' && !showForm ? (
         <EmptyState
           emoji="◷"
-          title="Напоминаний нет"
-          subtitle="Добавьте напоминание, чтобы ничего не упустить."
-          action={{ label: '+ Добавить напоминание', onClick: () => setShowForm(true) }}
+          title="No reminders yet"
+          subtitle="Add a reminder so you never miss a thing."
+          action={{ label: '+ Add reminder', onClick: () => setShowForm(true) }}
         />
       ) : null}
 
@@ -441,7 +457,7 @@ export function RemindersScreen({ extraReminders }: RemindersProps) {
             className="text-[10px] font-semibold tracking-widest mb-3"
             style={{ color: '#4ECBA0' }}
           >
-            ВЫПОЛНЕНО
+            COMPLETED
           </p>
           <div className="flex flex-col gap-2.5">
             {done.map((r, i) => (

@@ -3,26 +3,26 @@ import { Shell } from '@/components/layout/Shell';
 const FEATURES = [
   {
     icon: '⚡',
-    label: 'Мгновенная запись',
-    desc: 'Мысль пришла в дороге? Один тап — и она в безопасности.',
+    label: 'Instant capture',
+    desc: 'Thought hit you on the go? One tap — and it\'s safe.',
   },
   {
     icon: '♡',
-    label: 'Эмоциональный интеллект',
-    desc: 'Отслеживайте настроение, видите паттерны, дышите через перегрузку.',
+    label: 'Emotional intelligence',
+    desc: 'Track your mood, spot patterns, breathe through overwhelm.',
   },
   {
     icon: '◷',
-    label: 'Умные напоминания',
-    desc: 'Поставьте один раз. Synq помнит — голова отдыхает.',
+    label: 'Smart reminders',
+    desc: 'Set it once. Synq remembers — your head can rest.',
   },
-  { icon: '🧠', label: 'ИИ-собеседник', desc: 'Говорите с Synq, когда нужно место без осуждения.' },
+  { icon: '🧠', label: 'AI companion', desc: 'Talk to Synq when you need a space without judgment.' },
 ];
 
 const STATS = [
-  { value: '2.4×', label: 'меньше ментальной нагрузки' },
-  { value: '87%', label: 'пользователей спят лучше' },
-  { value: '< 3с', label: 'чтобы записать мысль' },
+  { value: '2.4×', label: 'less mental load' },
+  { value: '87%', label: 'of users sleep better' },
+  { value: '< 3s', label: 'to capture a thought' },
 ];
 
 export default function Home() {
@@ -58,21 +58,21 @@ export default function Home() {
                 className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
                 style={{ background: '#1E1A3A', color: '#9B8EFF', border: '1px solid #2E2B4A' }}
               >
-                ДЕМО ДЛЯ ИНВЕСТОРОВ
+                INVESTOR DEMO
               </span>
             </div>
             <h1
               className="text-4xl font-bold leading-tight tracking-tight"
               style={{ color: '#EEECEA' }}
             >
-              Эмоционально безопасная
+              Emotionally safe
               <br />
-              <span style={{ color: '#7B6EF6' }}>запись мыслей</span>
+              <span style={{ color: '#7B6EF6' }}>thought capture</span>
             </h1>
             <p className="text-base mt-3 leading-relaxed" style={{ color: '#888680' }}>
-              Единственное приложение для продуктивности, которое спрашивает{' '}
-              <em style={{ color: '#EEECEA' }}>«как ты себя чувствуешь?»</em> прежде чем спросить,
-              что нужно сделать.
+              The only productivity app that asks{' '}
+              <em style={{ color: '#EEECEA' }}>"how are you feeling?"</em> before it asks what
+              you need to do.
             </p>
           </div>
 
@@ -118,14 +118,15 @@ export default function Home() {
 
           {/* CTA */}
           <div className="flex flex-col gap-2">
-            <button
-              className="w-full py-3.5 rounded-2xl text-sm font-semibold text-white"
+            <a
+              href="/auth/signup"
+              className="w-full py-3.5 rounded-2xl text-sm font-semibold text-white block text-center"
               style={{ background: '#7B6EF6' }}
             >
-              Запросить ранний доступ →
-            </button>
+              Get started free →
+            </a>
             <p className="text-[11px] text-center" style={{ color: '#4A4850' }}>
-              Все данные в демо симулированы · Регистрация не нужна
+              All demo data is simulated · No sign-up needed
             </p>
           </div>
         </div>

@@ -7,11 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export function greeting(): string {
   const h = new Date().getHours();
-  if (h < 6) return 'Ещё не спите?';
-  if (h < 12) return 'Доброе утро';
-  if (h < 17) return 'Добрый день';
-  if (h < 21) return 'Добрый вечер';
-  return 'Доброй ночи';
+  if (h < 6) return 'Still up?';
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  if (h < 21) return 'Good evening';
+  return 'Good night';
 }
 
 export const PALETTE = {

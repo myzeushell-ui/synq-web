@@ -21,14 +21,22 @@ const MOODS: MoodTag[] = [
 
 interface Props {
   extraEmotions?: Emotion[];
+  initialEmotions?: Emotion[];
+  onLogEmotion?: (e: Omit<Emotion, 'id' | 'loggedAt'>) => void;
 }
 
-export function EmotionsScreen({ extraEmotions }: Props) {
+export function EmotionsScreen({ extraEmotions, initialEmotions, onLogEmotion }: Props) {
   const [selected, setSelected] = useState<MoodTag | null>(null);
   const [note, setNote] = useState('');
   const [logged, setLogged] = useState(false);
   const [breathOpen, setBreathOpen] = useState(false);
-  const [emotions, setEmotions] = useState<Emotion[]>(DEMO_EMOTIONS);
+  const [emotions, setEmotions] = useState<Emotion[]>(initialEmotions ?? DEMO_EMOTIONS);
+
+  // Sync when initialEmotions change
+  useEffect(() => {
+    if (initialEmotions) setEmotions(initialEmotions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialEmotions]);
 
   // Merge voice-captured emotions
   useEffect(() => {
@@ -45,6 +53,7 @@ export function EmotionsScreen({ extraEmotions }: Props) {
     if (!selected) return;
     setLogged(true);
     setTimeout(() => setLogged(false), 2000);
+    onLogEmotion?.({ mood: selected, note: note || undefined, intensity: 3 });
     setSelected(null);
     setNote('');
   };
@@ -74,10 +83,10 @@ export function EmotionsScreen({ extraEmotions }: Props) {
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight" style={{ color: '#EEECEA' }}>
-              Эмоции
+              Emotions
             </h2>
             <p className="text-sm mt-1" style={{ color: '#888680' }}>
-              Как вы себя чувствуете?
+              How are you feeling?
             </p>
           </div>
           <motion.button
@@ -86,7 +95,7 @@ export function EmotionsScreen({ extraEmotions }: Props) {
             className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-semibold"
             style={{ background: '#0A1828', border: '1px solid #102040', color: '#5BA4F5' }}
           >
-            <span>🌬</span> Дышать
+            <span>🌬</span> Breathe
           </motion.button>
         </div>
 
@@ -99,7 +108,7 @@ export function EmotionsScreen({ extraEmotions }: Props) {
             className="text-[10px] font-semibold tracking-widest mb-3"
             style={{ color: '#4A4850' }}
           >
-            ЗАПИСАТЬ
+            LOG
           </p>
           <div className="grid grid-cols-4 gap-2 mb-4">
             {MOODS.map((m) => {
@@ -137,7 +146,7 @@ export function EmotionsScreen({ extraEmotions }: Props) {
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Заметка (необязательно)…"
+                placeholder="Note (optional)…"
                 rows={2}
                 className="w-full rounded-xl p-3 text-sm resize-none outline-none mb-3"
                 style={{ background: '#0A0A0D', border: '0.5px solid #2C2C32', color: '#EEECEA' }}
@@ -152,7 +161,7 @@ export function EmotionsScreen({ extraEmotions }: Props) {
             className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-150"
             style={{ background: selected ? '#7B6EF6' : '#242428' }}
           >
-            {logged ? '✓ Записано!' : 'Записать эмоцию'}
+            {logged ? '✓ Logged!' : 'Log emotion'}
           </motion.button>
         </div>
 
@@ -169,7 +178,7 @@ export function EmotionsScreen({ extraEmotions }: Props) {
               {emotions.length}
             </p>
             <p className="text-xs mt-1" style={{ color: '#888680' }}>
-              Эмоций записано
+              Emotions logged
             </p>
           </div>
           <div

@@ -45,7 +45,7 @@ function fallbackPick(input: string): string {
   return FALLBACKS.default;
 }
 
-const QUICK_PROMPTS = ["I'm feeling anxious today", "I'm overwhelmed", 'I feel stuck', 'Мне плохо'];
+const QUICK_PROMPTS = ["I'm feeling anxious today", "I'm overwhelmed", "I feel stuck", "I don't know where to start"];
 
 interface Props {
   onClose: () => void;

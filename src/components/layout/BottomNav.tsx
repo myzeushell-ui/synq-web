@@ -10,11 +10,11 @@ interface NavItem {
 }
 
 const ITEMS: NavItem[] = [
-  { id: 'home', label: 'Главная', icon: '⌂' },
-  { id: 'thoughts', label: 'Мысли', icon: '✦' },
-  { id: 'capture', label: 'Запись', icon: '+' },
-  { id: 'emotions', label: 'Эмоции', icon: '♡' },
-  { id: 'reminders', label: 'Напомни', icon: '◷' },
+  { id: 'home', label: 'Home', icon: '⌂' },
+  { id: 'thoughts', label: 'Thoughts', icon: '✦' },
+  { id: 'capture', label: 'Capture', icon: '+' },
+  { id: 'emotions', label: 'Emotions', icon: '♡' },
+  { id: 'reminders', label: 'Remind', icon: '◷' },
 ];
 
 interface Props {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { BottomNav } from './BottomNav';
 import { DemoBanner } from '../demo/DemoBanner';
 import { HomeScreen } from '../demo/HomeScreen';
@@ -19,8 +20,17 @@ import {
   scheduleNotification,
   notificationsSupported,
 } from '@/lib/notifications';
+import { useThoughts } from '@/hooks/useThoughts';
+import { useEmotions } from '@/hooks/useEmotions';
+import { useReminders } from '@/hooks/useReminders';
+import { createClient } from '@/lib/supabase/client';
 
 export type Tab = 'home' | 'thoughts' | 'emotions' | 'reminders';
+
+interface ShellProps {
+  userId?: string;
+  userName?: string;
+}
 
 const PAGE_VARIANTS: Variants = {
   initial: { opacity: 0, y: 10 },
@@ -42,7 +52,7 @@ const LIGHT_CSS = `
   .light-mode [style*="border-color: #2C2C32"], .light-mode [style*="border: 0.5px solid #2C2C32"] { border-color: #D8D6DC !important; }
 `;
 
-export function Shell() {
+export function Shell({ userId, userName }: ShellProps = {}) {
   const [tab, setTab] = useState<Tab>('home');
   const [captureOpen, setCaptureOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
@@ -55,6 +65,20 @@ export function Shell() {
   const [extraThoughts, setExtraThoughts] = useState<Thought[]>([]);
   const [extraReminders, setExtraReminders] = useState<Reminder[]>([]);
   const [extraEmotions, setExtraEmotions] = useState<Emotion[]>([]);
+
+  const router = useRouter();
+
+  // ── Real data hooks (only active when userId is provided) ─────────────────
+  const { thoughts: dbThoughts, add: addThought, update: updateThought, remove: removeThought } = useThoughts(userId);
+  const { emotions: dbEmotions, add: addEmotion } = useEmotions(userId);
+  const { reminders: dbReminders, add: addReminder, toggle: toggleReminder, remove: removeReminder } = useReminders(userId);
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
+  };
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<number>(0);
@@ -110,27 +134,76 @@ export function Shell() {
   };
 
   /** Called by VoiceModal when user confirms parsed items */
-  const handleVoiceSave = useCallback((result: ParseResult) => {
-    if (result.thoughts.length) setExtraThoughts((p) => [...result.thoughts, ...p]);
-    if (result.reminders.length) {
-      setExtraReminders((p) => [...result.reminders, ...p]);
-      // Schedule browser notifications for every reminder with a future dueAt
-      result.reminders.forEach((r) => {
-        if (r.dueAt && new Date(r.dueAt).getTime() > Date.now()) {
-          scheduleNotification(r.id, r.title, `Synq reminder`, r.dueAt);
+  const handleVoiceSave = useCallback(
+    async (result: ParseResult) => {
+      // Thoughts
+      if (result.thoughts.length) {
+        if (userId) {
+          for (const t of result.thoughts) await addThought(t);
+        } else {
+          setExtraThoughts((p) => [...result.thoughts, ...p]);
         }
-      });
-    }
-    if (result.emotions.length) setExtraEmotions((p) => [...result.emotions, ...p]);
-  }, []);
+      }
+      // Reminders
+      if (result.reminders.length) {
+        if (userId) {
+          for (const r of result.reminders) await addReminder(r);
+        } else {
+          setExtraReminders((p) => [...result.reminders, ...p]);
+        }
+        result.reminders.forEach((r) => {
+          if (r.dueAt && new Date(r.dueAt).getTime() > Date.now()) {
+            scheduleNotification(r.id, r.title, `Synq reminder`, r.dueAt);
+          }
+        });
+      }
+      // Emotions
+      if (result.emotions.length) {
+        if (userId) {
+          for (const e of result.emotions) await addEmotion(e);
+        } else {
+          setExtraEmotions((p) => [...result.emotions, ...p]);
+        }
+      }
+    },
+    [userId, addThought, addReminder, addEmotion]
+  );
 
   const screens: Record<Tab, React.ReactNode> = {
-    home: <HomeScreen onCapture={() => setCaptureOpen(true)} onChat={() => setChatOpen(true)} />,
-    thoughts: (
-      <ThoughtsScreen onCapture={() => setCaptureOpen(true)} extraThoughts={extraThoughts} />
+    home: (
+      <HomeScreen
+        onCapture={() => setCaptureOpen(true)}
+        onChat={() => setChatOpen(true)}
+        thoughts={userId ? dbThoughts : undefined}
+        emotions={userId ? dbEmotions : undefined}
+        userName={userName}
+      />
     ),
-    emotions: <EmotionsScreen extraEmotions={extraEmotions} />,
-    reminders: <RemindersScreen extraReminders={extraReminders} />,
+    thoughts: (
+      <ThoughtsScreen
+        onCapture={() => setCaptureOpen(true)}
+        extraThoughts={extraThoughts}
+        initialThoughts={userId ? dbThoughts : undefined}
+        onUpdateThought={userId ? updateThought : undefined}
+        onDeleteThought={userId ? removeThought : undefined}
+      />
+    ),
+    emotions: (
+      <EmotionsScreen
+        extraEmotions={extraEmotions}
+        initialEmotions={userId ? dbEmotions : undefined}
+        onLogEmotion={userId ? addEmotion : undefined}
+      />
+    ),
+    reminders: (
+      <RemindersScreen
+        extraReminders={extraReminders}
+        initialReminders={userId ? dbReminders : undefined}
+        onToggleReminder={userId ? toggleReminder : undefined}
+        onDeleteReminder={userId ? removeReminder : undefined}
+        onAddReminder={userId ? addReminder : undefined}
+      />
+    ),
   };
 
   return (
@@ -142,7 +215,32 @@ export function Shell() {
         className={`flex flex-col h-screen max-w-md mx-auto relative overflow-hidden${darkMode ? '' : ' light-mode'}`}
         style={{ background: darkMode ? '#0A0A0D' : '#F4F2EF' }}
       >
-        <DemoBanner darkMode={darkMode} onToggleTheme={toggleTheme} />
+        {!userId && <DemoBanner darkMode={darkMode} onToggleTheme={toggleTheme} />}
+        {userId && (
+          <div className="flex items-center justify-between px-4 py-2 shrink-0"
+            style={{ borderBottom: `0.5px solid ${darkMode ? '#2C2C32' : '#E0DED8'}` }}>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                style={{ background: '#7B6EF6' }}>S</div>
+              <span className="text-xs font-semibold" style={{ color: darkMode ? '#EEECEA' : '#1A1820' }}>
+                {userName ?? 'Synq'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={toggleTheme}
+                className="w-7 h-7 rounded-full flex items-center justify-center text-xs"
+                style={{ background: darkMode ? '#1C1C21' : '#E4E2E8', color: '#7B6EF6' }}
+                title={darkMode ? 'Light mode' : 'Dark mode'}>
+                {darkMode ? '☀️' : '🌙'}
+              </button>
+              <button onClick={handleSignOut}
+                className="text-xs px-2.5 py-1 rounded-lg"
+                style={{ background: '#1C1C21', color: '#888680', border: '0.5px solid #2C2C32' }}>
+                Sign out
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Page area */}
         <div className="flex-1 overflow-hidden relative">
@@ -217,7 +315,23 @@ export function Shell() {
         </div>
 
         <AnimatePresence>
-          {captureOpen && <CaptureModal onClose={() => setCaptureOpen(false)} />}
+          {captureOpen && (
+            <CaptureModal
+              onClose={() => setCaptureOpen(false)}
+              onSave={async (newThoughts) => {
+                if (userId) {
+                  for (const t of newThoughts) await addThought(t);
+                } else {
+                  const toAdd = newThoughts.map((t) => ({
+                    ...t,
+                    id: crypto.randomUUID(),
+                    createdAt: new Date().toISOString(),
+                  }));
+                  setExtraThoughts((p) => [...toAdd, ...p]);
+                }
+              }}
+            />
+          )}
         </AnimatePresence>
 
         <AnimatePresence>

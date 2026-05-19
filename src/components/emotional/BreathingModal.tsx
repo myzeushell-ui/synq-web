@@ -18,11 +18,11 @@ const DURATIONS: Record<Phase, number> = {
   'hold-out': 4000,
 };
 const LABELS: Record<Phase, string> = {
-  idle: 'Готовы дышать',
-  inhale: 'Вдох…',
-  'hold-in': 'Держите…',
-  exhale: 'Выдох…',
-  'hold-out': 'Держите…',
+  idle: 'Ready to breathe',
+  inhale: 'Inhale…',
+  'hold-in': 'Hold…',
+  exhale: 'Exhale…',
+  'hold-out': 'Hold…',
 };
 const CIRCLE_SCALE: Record<Phase, number> = {
   idle: 1,
@@ -113,10 +113,10 @@ export function BreathingModal({ onClose }: Props) {
         {/* Title */}
         <div className="text-center mb-6">
           <h3 className="text-lg font-bold mb-1" style={{ color: '#EEECEA' }}>
-            Коробочное дыхание
+            Box Breathing
           </h3>
           <p className="text-xs" style={{ color: '#888680' }}>
-            4-4-4-4 · {cycles} цикл{cycles === 1 ? '' : cycles < 5 ? 'а' : 'ов'} завершено
+            4-4-4-4 · {cycles} cycle{cycles === 1 ? '' : 's'} completed
           </p>
         </div>
 
@@ -176,12 +176,12 @@ export function BreathingModal({ onClose }: Props) {
               />
               <span className="text-[9px]" style={{ color: '#4A4850' }}>
                 {p === 'inhale'
-                  ? 'Вдох'
+                  ? 'In'
                   : p === 'hold-in'
-                    ? 'Держ.'
+                    ? 'Hold'
                     : p === 'exhale'
-                      ? 'Выдох'
-                      : 'Держ.'}
+                      ? 'Out'
+                      : 'Hold'}
               </span>
             </div>
           ))}
@@ -194,7 +194,7 @@ export function BreathingModal({ onClose }: Props) {
             className="flex-1 py-3 rounded-2xl text-sm font-medium"
             style={{ background: '#242428', color: '#888680' }}
           >
-            Закрыть
+            Close
           </button>
           <button
             onClick={running ? handleStop : handleStart}
@@ -204,7 +204,7 @@ export function BreathingModal({ onClose }: Props) {
               color: running ? '#E07B62' : '#fff',
             }}
           >
-            {running ? 'Стоп' : 'Начать'}
+            {running ? 'Stop' : 'Start'}
           </button>
         </div>
       </motion.div>

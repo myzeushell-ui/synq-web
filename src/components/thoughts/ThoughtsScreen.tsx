@@ -12,21 +12,24 @@ import type { Category, TaskState, Thought } from '@/types';
 interface Props {
   onCapture: () => void;
   extraThoughts?: import('@/types').Thought[];
+  initialThoughts?: import('@/types').Thought[];
+  onUpdateThought?: (id: string, patch: Partial<Thought>) => void;
+  onDeleteThought?: (id: string) => void;
 }
 
 const STATES: { id: TaskState | 'all'; label: string; color: string }[] = [
-  { id: 'all', label: 'Все', color: '#7B6EF6' },
-  { id: 'active', label: 'Активные', color: '#7B6EF6' },
-  { id: 'paused', label: 'Пауза', color: '#E8B84B' },
-  { id: 'overwhelmed', label: 'Много', color: '#E07B62' },
-  { id: 'done', label: 'Готово', color: '#4ECBA0' },
+  { id: 'all', label: 'All', color: '#7B6EF6' },
+  { id: 'active', label: 'Active', color: '#7B6EF6' },
+  { id: 'paused', label: 'Paused', color: '#E8B84B' },
+  { id: 'overwhelmed', label: 'Heavy', color: '#E07B62' },
+  { id: 'done', label: 'Done', color: '#4ECBA0' },
 ];
 
-export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
+export function ThoughtsScreen({ onCapture, extraThoughts, initialThoughts, onUpdateThought, onDeleteThought }: Props) {
   const [stateFilter, setStateFilter] = useState<TaskState | 'all'>('all');
   const [catFilter, setCatFilter] = useState<Category | 'all'>('all');
   const [query, setQuery] = useState('');
-  const [thoughts, setThoughts] = useState<Thought[]>(DEMO_THOUGHTS);
+  const [thoughts, setThoughts] = useState<Thought[]>(initialThoughts ?? DEMO_THOUGHTS);
   const [loading, setLoading] = useState(true);
   const [undoItem, setUndoItem] = useState<{ thought: Thought; idx: number } | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,8 +57,15 @@ export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
     return true;
   });
 
+  // Sync when initialThoughts change (e.g. after DB refetch)
+  useEffect(() => {
+    if (initialThoughts) setThoughts(initialThoughts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialThoughts]);
+
   const handleStateChange = (id: string, state: TaskState) => {
     setThoughts((prev) => prev.map((t) => (t.id === id ? { ...t, state } : t)));
+    onUpdateThought?.(id, { state });
   };
 
   const handleDelete = (id: string) => {
@@ -63,6 +73,7 @@ export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
     if (idx < 0) return;
     const removed = thoughts[idx];
     setThoughts((prev) => prev.filter((t) => t.id !== id));
+    onDeleteThought?.(id);
 
     // Clear previous undo timer
     if (undoTimer.current) clearTimeout(undoTimer.current);
@@ -83,10 +94,10 @@ export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
   };
 
   const sections: { state: TaskState; label: string; color: string }[] = [
-    { state: 'active', label: 'АКТИВНЫЕ', color: '#7B6EF6' },
-    { state: 'paused', label: 'ПАУЗА', color: '#E8B84B' },
-    { state: 'overwhelmed', label: 'МНОГО', color: '#E07B62' },
-    { state: 'done', label: 'ГОТОВО', color: '#4ECBA0' },
+    { state: 'active', label: 'ACTIVE', color: '#7B6EF6' },
+    { state: 'paused', label: 'PAUSED', color: '#E8B84B' },
+    { state: 'overwhelmed', label: 'HEAVY', color: '#E07B62' },
+    { state: 'done', label: 'DONE', color: '#4ECBA0' },
   ];
 
   return (
@@ -94,14 +105,14 @@ export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
       {/* Header */}
       <div className="px-5 pt-6 pb-3 flex items-center gap-3">
         <h2 className="text-2xl font-bold tracking-tight flex-1" style={{ color: '#EEECEA' }}>
-          Мысли
+          Thoughts
         </h2>
         <button
           onClick={onCapture}
           className="text-xs font-semibold px-3 py-1.5 rounded-full"
           style={{ background: '#1E1A3A', color: '#7B6EF6', border: '1px solid #2E2B4A' }}
         >
-          + Записать
+          + Capture
         </button>
       </div>
 
@@ -110,7 +121,7 @@ export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Поиск мыслей…"
+          placeholder="Search thoughts…"
           className="w-full px-4 py-2.5 rounded-xl text-sm outline-none"
           style={{ background: '#141417', border: '0.5px solid #2C2C32', color: '#EEECEA' }}
         />
@@ -145,7 +156,7 @@ export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
             color: catFilter === 'all' ? '#7B6EF6' : '#4A4850',
           }}
         >
-          Все
+          All
         </button>
         {(['task', 'idea', 'emotion', 'note'] as Category[]).map((c) => {
           const meta = getCategoryMeta(c);
@@ -177,15 +188,15 @@ export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
         thoughts.length === 0 ? (
           <EmptyState
             emoji="✦"
-            title="Пока нет мыслей"
-            subtitle="Запишите, что у вас на уме — задачи, идеи, чувства. Без осуждения."
-            action={{ label: '+ Записать мысль', onClick: onCapture }}
+            title="No thoughts yet"
+            subtitle="Capture what's on your mind — tasks, ideas, feelings. No judgment."
+            action={{ label: '+ Capture a thought', onClick: onCapture }}
           />
         ) : (
           <EmptyState
             emoji="🔍"
-            title="Ничего не найдено"
-            subtitle="Попробуйте изменить фильтры или поисковый запрос."
+            title="Nothing found"
+            subtitle="Try changing your filters or search query."
           />
         )
       ) : stateFilter !== 'all' ? (
@@ -251,14 +262,14 @@ export function ThoughtsScreen({ onCapture, extraThoughts }: Props) {
             }}
           >
             <span className="text-xs flex-1" style={{ color: '#888680' }}>
-              Мысль удалена
+              Thought deleted
             </span>
             <button
               onClick={handleUndo}
               className="text-xs font-semibold"
               style={{ color: '#7B6EF6' }}
             >
-              Отменить
+              Undo
             </button>
           </motion.div>
         )}

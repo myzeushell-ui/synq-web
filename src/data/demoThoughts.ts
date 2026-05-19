@@ -7,17 +7,17 @@ const d = (days: number) => new Date(now.getTime() + days * 86_400_000).toISOStr
 export const DEMO_THOUGHTS: Thought[] = [
   {
     id: 'dt-1',
-    text: 'Подготовить инвестиционную презентацию — добавить метрики роста',
+    text: 'Prepare investor deck — add growth metrics',
     category: 'task',
     state: 'active',
     priority: 'high',
     createdAt: h(1),
     deadline: d(1),
-    tags: ['инвестор', 'срочно'],
+    tags: ['investor', 'urgent'],
   },
   {
     id: 'dt-2',
-    text: 'Тревожусь перед завтрашним демо. Нужно подышать.',
+    text: 'Nervous about tomorrow\'s demo. Need to breathe.',
     category: 'emotion',
     state: 'active',
     priority: 'normal',
@@ -25,7 +25,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-3',
-    text: 'Идея: режим "выгрузки мозга" — пользователь пишет всё подряд, а Synq сам всё раскладывает',
+    text: 'Idea: "brain dump" mode — user writes everything, Synq sorts it automatically',
     category: 'idea',
     state: 'active',
     priority: 'normal',
@@ -33,7 +33,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-4',
-    text: 'Позвонить Марии по поводу сессии обратной связи',
+    text: 'Call Maria about the feedback session',
     category: 'task',
     state: 'done',
     priority: 'normal',
@@ -41,7 +41,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-5',
-    text: 'Забронировать коворкинг на следующий вторник',
+    text: 'Book coworking space for next Tuesday',
     category: 'task',
     state: 'active',
     priority: 'normal',
@@ -50,7 +50,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-6',
-    text: 'ИИ-слой эмоциональной поддержки можно интегрировать с КПТ-техниками от терапевтов',
+    text: 'AI emotional support layer could integrate CBT techniques from therapists',
     category: 'idea',
     state: 'active',
     priority: 'high',
@@ -58,7 +58,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-7',
-    text: 'Подать заявление на возмещение расходов в бухгалтерию',
+    text: 'Submit expense reimbursement to accounting',
     category: 'task',
     state: 'paused',
     priority: 'low',
@@ -67,7 +67,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-8',
-    text: 'Благодарна команде сегодня. Все пришли и поддержали.',
+    text: 'Grateful for the team today. Everyone showed up and supported.',
     category: 'emotion',
     state: 'active',
     priority: 'normal',
@@ -75,7 +75,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-9',
-    text: 'Пересмотреть онбординг — слишком много шагов до первой записи',
+    text: 'Rethink onboarding — too many steps before the first capture',
     category: 'note',
     state: 'active',
     priority: 'normal',
@@ -83,7 +83,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-10',
-    text: 'Задач слишком много, не знаю за что браться',
+    text: 'Too many tasks, don\'t know where to start',
     category: 'emotion',
     state: 'overwhelmed',
     priority: 'normal',
@@ -91,7 +91,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-11',
-    text: 'Написать юнит-тесты для слоя хранения данных',
+    text: 'Write unit tests for the data storage layer',
     category: 'task',
     state: 'active',
     priority: 'normal',
@@ -100,7 +100,7 @@ export const DEMO_THOUGHTS: Thought[] = [
   },
   {
     id: 'dt-12',
-    text: 'Анализ конкурентов: как Notion работает с эмоциональным контекстом?',
+    text: 'Competitor analysis: how does Notion handle emotional context?',
     category: 'note',
     state: 'done',
     priority: 'low',
@@ -109,7 +109,7 @@ export const DEMO_THOUGHTS: Thought[] = [
 ];
 
 export const DEMO_USER = {
-  name: 'Аня',
+  name: 'Alex',
   avatar: '🧠',
   streak: 5,
   totalCaptured: DEMO_THOUGHTS.length,
