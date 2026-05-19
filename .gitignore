@@ -7,6 +7,8 @@
 
 # dependencies
 /node_modules
+**/node_modules
+scripts/node_modules
 /.pnp
 .pnp.*
 .yarn/*
